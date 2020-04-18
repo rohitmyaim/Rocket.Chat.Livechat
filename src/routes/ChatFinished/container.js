@@ -7,7 +7,7 @@ import ChatFinished from './component';
 
 export class ChatFinishedContainer extends Component {
 	handleRedirect = () => {
-		route('/');
+		route('/register');
 	}
 
 	render = (props) => (

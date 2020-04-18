@@ -22,11 +22,22 @@ export class RegisterContainer extends Component {
 		return department;
 	}
 
+	getHelptopic = (fields = {}) => {
+		let { helptopic } = fields;
+		return helptopic;
+	}
+
 	handleSubmit = async (fields) => {
 		const { dispatch, token } = this.props;
 		const department = this.getDepartment(fields);
-		Object.assign(fields, { department });
-
+		const helptopic = this.getHelptopic(fields); 
+		delete fields["helptopic"];
+		const customFields = [{
+			key: 'helptopic',
+			value: helptopic,
+			overwrite: true
+		}];
+		Object.assign(fields, { department, customFields });
 		await dispatch({ loading: true, department });
 		try {
 			const user = await Livechat.grantVisitor({ visitor: { ...fields, token } });
@@ -63,6 +74,7 @@ export const RegisterConnector = ({ ref, ...props }) => (
 		{({
 			config: {
 				departments = {},
+				helptopics = {},
 				messages: {
 					registrationFormMessage: message,
 				} = {},
@@ -107,7 +119,9 @@ export const RegisterConnector = ({ ref, ...props }) => (
 				hasNameField={hasNameField}
 				hasEmailField={hasEmailField}
 				hasDepartmentField={departments && departments.some((dept) => dept.showOnRegistration)}
+				// hasHelpTopicField={helptopics && helptopics.some((helptopic) => helptopic.showOnRegistration)}
 				departments={departments.filter((dept) => dept.showOnRegistration)}
+				// helptopics={helptopics.filter((helptopic) => helptopic.showOnRegistration)}
 				nameDefault={guestName}
 				emailDefault={guestEmail}
 				guestDepartment={guestDepartment}

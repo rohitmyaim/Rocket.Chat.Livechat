@@ -36,6 +36,7 @@ export class App extends Component {
 					},
 					online,
 					departments = [],
+					helptopics = [],
 				},
 				gdpr: {
 					accepted: gdprAccepted,

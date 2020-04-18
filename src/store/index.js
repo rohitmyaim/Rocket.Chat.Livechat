@@ -14,6 +14,7 @@ const initialState = {
 		theme: {},
 		triggers: [],
 		departments: [],
+		helptopics: [],
 		resources: {},
 	},
 	messages: [],

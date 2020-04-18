@@ -13,6 +13,21 @@ import Screen from '../../components/Screen';
 import { createClassName, sortArrayByColumn } from '../../components/helpers';
 import styles from './styles.scss';
 
+const hasHelpTopicField = true;
+const helptopics = [
+	{
+		_id: "NEED_PASSWORD_RESET",
+		name: "Do you need password reset",
+		showOnRegistration: true,
+		showOnOfflineForm: true
+	},
+	{
+		_id : "NEW_PORTAL_ACCOUNT",
+		name : "Do you need a new portal account?",
+		showOnRegistration: true,
+		showOnOfflineForm: true
+	}
+];
 
 const defaultTitle = I18n.t('Need help?');
 const defaultMessage = I18n.t('Please, tell us some information to start the chat');
@@ -21,6 +36,7 @@ export default class Register extends Component {
 	state = {
 		name: null,
 		email: null,
+		helptopic: null,
 		department: null,
 	}
 
@@ -28,6 +44,7 @@ export default class Register extends Component {
 		name: [Validations.nonEmpty],
 		email: [Validations.nonEmpty, Validations.email],
 		department: [],
+		helptopic: [],
 	}
 
 	getValidableFields = () => Object.keys(this.validations)
@@ -55,6 +72,8 @@ export default class Register extends Component {
 	handleEmailChange = this.handleFieldChange('email')
 
 	handleDepartmentChange = this.handleFieldChange('department')
+
+	handleHelptopicChange = this.handleFieldChange('helptopic')
 
 	handleSubmit = (event) => {
 		event.preventDefault();
@@ -91,6 +110,16 @@ export default class Register extends Component {
 			}
 		}
 
+		if (hasHelpTopicField && helptopics) {
+			if (helptopics.length > 1) {
+				this.state.helptopic = { value: '' };
+			} else if (helptopics.length === 1) {
+				this.state.helptopic = { value: helptopics[0]._id };
+			} else {
+				this.state.helptopic = null;
+			}
+		}
+
 		this.validateAll();
 	}
 
@@ -117,10 +146,18 @@ export default class Register extends Component {
 			this.setState({ department: null });
 		}
 
+		const helptopicValue = (helptopics && helptopics.length === 1 && helptopics[0]._id) || '';
+		const showHelptopicField = hasHelpTopicField && helptopics && helptopics.length > 1;
+		if (showHelptopicField && (!this.state.helptopic || this.state.helptopic !== helptopicValue)) {
+			this.setState({ helptopic: { ...this.state.helptopic, value: helptopicValue } });
+		} else if (!showHelptopicField) {
+			this.setState({ helptopic: null });
+		}
+
 		this.validateAll();
 	}
 
-	render({ title, color, message, loading, departments, ...props }, { name, email, department }) {
+	render({ title, color, message, loading, departments, ...props }, { name, email, department, helptopic }) {
 		const valid = this.isValid();
 
 		return (
@@ -169,11 +206,27 @@ export default class Register extends Component {
 								</FormField>
 							)
 							: null}
-
+						{helptopic
+							? (
+								<FormField
+									label={I18n.t('What can I help you with today ?')}
+									error={helptopic.showError && helptopic.error}
+								>
+									<SelectInput
+										name="helptopic"
+										value={helptopic.value}
+										options={helptopics.map(({ _id, name }) => ({ value: _id, label: name }))}
+										placeholder={I18n.t('Choose an option...')}
+										disabled={loading}
+										onInput={this.handleHelptopicChange}
+									/>
+								</FormField>
+							)
+							: null}
 						{department
 							? (
 								<FormField
-									label={I18n.t('I need help with...')}
+									label={I18n.t('Please select Jurisdiction for your referral')}
 									error={department.showError && department.error}
 								>
 									<SelectInput
